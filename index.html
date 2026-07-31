@@ -9,8 +9,8 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">Ski Pole Project OS<small>The new and improved ski pole</small></div>
-      <nav id="nav" class="nav"></nav>
+      <div class="brand">Ski Pole Project OS<small>Your project in one place</small></div>
+      <nav id="nav" class="nav" aria-label="Project sections"></nav>
     </aside>
 
     <main class="main">
@@ -36,101 +36,105 @@
       </section>
 
       <section id="brief" class="page">
-        <header class="page-head"><h1>Project brief</h1><p>Keep the purpose and direction of the project in one place.</p></header>
-        <div class="grid two">
-          <div class="card form-stack">
+        <header class="page-head">
+          <div><h1>Project brief</h1><p>The main idea and direction of your project.</p></div>
+          <button class="icon-text-button" type="button" data-action="edit-brief"><span>✎</span> Edit</button>
+        </header>
+        <div id="briefView" class="grid two"></div>
+        <div id="briefEditor" class="card editor-panel" hidden>
+          <div class="form-grid two">
             <label>Title<input id="briefTitle"></label>
+            <label>Driving question<textarea id="briefQuestion"></textarea></label>
             <label>Purpose<textarea id="briefPurpose"></textarea></label>
             <label>Impact<textarea id="briefImpact"></textarea></label>
+            <label class="full">First steps<textarea id="briefSteps"></textarea></label>
           </div>
-          <div class="card form-stack">
-            <label>Driving question<textarea id="briefQuestion"></textarea></label>
-            <label>First steps<textarea id="briefSteps"></textarea></label>
-            <button id="saveBrief" class="primary">Save brief</button>
-          </div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="cancel-brief">Cancel</button><button class="primary" type="button" data-action="save-brief">Save changes</button></div>
         </div>
       </section>
 
       <section id="materials" class="page">
-        <header class="page-head"><h1>Materials</h1><p>Track everything needed to build and test the ski pole.</p></header>
-        <div class="grid materials-layout">
-          <div class="card form-stack">
+        <header class="page-head">
+          <div><h1>Materials</h1><p>Everything you need to build and test the pole.</p></div>
+          <button class="primary" type="button" data-action="open-add-material">+ Add material</button>
+        </header>
+        <div id="materialEditor" class="card editor-panel" hidden>
+          <h2 id="materialEditorTitle">Add material</h2>
+          <input id="materialEditId" type="hidden">
+          <div class="form-grid two">
             <label>Material<input id="materialName" placeholder="Bamboo shaft"></label>
             <label>Quantity<input id="materialQty" placeholder="2 lengths"></label>
             <label>Purpose<input id="materialPurpose" placeholder="Main pole shaft"></label>
             <label>Status<select id="materialStatus"><option>Needed</option><option>Ordered</option><option>Have it</option><option>Tested</option></select></label>
-            <button id="addMaterial" class="primary">Add material</button>
           </div>
-          <div class="card"><div id="materialList" class="list"></div></div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-material-editor">Cancel</button><button class="primary" type="button" data-action="save-material">Save material</button></div>
         </div>
+        <div id="materialList" class="simple-list"></div>
       </section>
 
       <section id="kwl" class="page">
-        <header class="page-head"><h1>KWL chart</h1><p>Record what you know, what you want to know, and what you have learnt.</p></header>
-        <div class="grid three">
-          <div class="card"><h2>Know</h2><div id="knowList" class="list"></div><div class="inline-add"><input id="knowInput" placeholder="Add what you know"><button data-add-kwl="know" class="primary">Add</button></div></div>
-          <div class="card"><h2>Want to know</h2><div id="wantList" class="list"></div><div class="inline-add"><input id="wantInput" placeholder="Add a question"><button data-add-kwl="want" class="primary">Add</button></div></div>
-          <div class="card"><h2>Learnt</h2><div id="learntList" class="list"></div><div class="inline-add"><input id="learntInput" placeholder="Add new learning"><button data-add-kwl="learnt" class="primary">Add</button></div></div>
-        </div>
+        <header class="page-head"><div><h1>KWL</h1><p>Know, Want to know, and Learnt.</p></div></header>
+        <div id="kwlColumns" class="grid three"></div>
       </section>
 
       <section id="tasks" class="page">
-        <header class="page-head"><h1>Tasks</h1><p>Move the project from research through prototyping and testing.</p></header>
-        <div class="card">
-          <div class="task-entry"><input id="taskText" placeholder="New task"><select id="taskStage"><option>Research</option><option>Design</option><option>Prototype</option><option>Test</option><option>Done</option></select><button id="addTask" class="primary">Add task</button></div>
-          <div id="taskList" class="list spaced"></div>
+        <header class="page-head">
+          <div><h1>Tasks</h1><p>Your next actions, kept simple.</p></div>
+          <button class="primary" type="button" data-action="open-add-task">+ Add task</button>
+        </header>
+        <div id="taskEditor" class="card editor-panel" hidden>
+          <h2 id="taskEditorTitle">Add task</h2>
+          <input id="taskEditId" type="hidden">
+          <div class="form-grid two"><label>Task<input id="taskText"></label><label>Stage<select id="taskStage"><option>Research</option><option>Design</option><option>Prototype</option><option>Test</option><option>Done</option></select></label></div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-task-editor">Cancel</button><button class="primary" type="button" data-action="save-task">Save task</button></div>
         </div>
+        <div id="taskList" class="simple-list"></div>
       </section>
 
       <section id="sources" class="page">
-        <header class="page-head"><h1>Sources</h1><p>Save evidence and note what each source proves.</p></header>
-        <div class="grid two">
-          <div class="card form-stack">
-            <label>Title<input id="sourceTitle"></label>
-            <label>Link<input id="sourceUrl" type="url"></label>
-            <label>What it proves<textarea id="sourceClaim"></textarea></label>
-            <button id="addSource" class="primary">Save source</button>
-          </div>
-          <div class="card"><div id="sourceList" class="list"></div></div>
+        <header class="page-head">
+          <div><h1>Sources</h1><p>Evidence and what each source proves.</p></div>
+          <button class="primary" type="button" data-action="open-add-source">+ Add source</button>
+        </header>
+        <div id="sourceEditor" class="card editor-panel" hidden>
+          <h2 id="sourceEditorTitle">Add source</h2>
+          <input id="sourceEditId" type="hidden">
+          <div class="form-grid two"><label>Title<input id="sourceTitle"></label><label>Link<input id="sourceUrl" type="url"></label><label class="full">What it proves<textarea id="sourceClaim"></textarea></label></div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-source-editor">Cancel</button><button class="primary" type="button" data-action="save-source">Save source</button></div>
         </div>
+        <div id="sourceList" class="simple-list"></div>
       </section>
 
       <section id="calendar" class="page">
-        <header class="page-head"><h1>Calendar</h1><p>Add events manually or ask Project AI to schedule them.</p></header>
+        <header class="page-head">
+          <div><h1>Calendar</h1><p>Deadlines, meetings, build sessions, and tests.</p></div>
+          <button class="primary" type="button" data-action="open-add-event">+ Add event</button>
+        </header>
+        <div id="eventEditor" class="card editor-panel" hidden>
+          <h2 id="eventEditorTitle">Add event</h2>
+          <input id="eventEditId" type="hidden">
+          <div class="form-grid two"><label>Title<input id="eventTitle"></label><label>Date<input id="eventDate" type="date"></label><label>Time<input id="eventTime" type="time"></label><label>Type<select id="eventType"><option>Deadline</option><option>Meeting</option><option>Build</option><option>Testing</option><option>General</option></select></label></div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-event-editor">Cancel</button><button class="primary" type="button" data-action="save-event">Save event</button></div>
+        </div>
         <div class="calendar-layout">
           <div class="card">
-            <div class="calendar-head"><button id="previousMonth" class="secondary">Previous</button><h2 id="monthLabel"></h2><button id="nextMonth" class="secondary">Next</button></div>
+            <div class="calendar-head"><button id="previousMonth" class="secondary" type="button">Previous</button><h2 id="monthLabel"></h2><button id="nextMonth" class="secondary" type="button">Next</button></div>
             <div class="weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
             <div id="calendarGrid" class="calendar-grid"></div>
           </div>
-          <div class="card form-stack">
-            <h2>Add event</h2>
-            <label>Title<input id="eventTitle"></label>
-            <label>Date<input id="eventDate" type="date"></label>
-            <label>Time<input id="eventTime" type="time"></label>
-            <label>Type<select id="eventType"><option>Deadline</option><option>Meeting</option><option>Build</option><option>Testing</option><option>General</option></select></label>
-            <button id="addEvent" class="primary">Add event</button>
-            <h2>Upcoming</h2><div id="upcomingList" class="list"></div>
-          </div>
+          <div class="card"><h2>Upcoming</h2><div id="upcomingList" class="simple-list compact"></div></div>
         </div>
       </section>
 
       <section id="ai" class="page">
-        <header class="page-head"><h1>Project AI</h1><p>This assistant can read and change the information saved in this dashboard.</p></header>
+        <header class="page-head"><div><h1>Project AI</h1><p>Ask questions or tell it to update your project.</p></div></header>
         <div class="ai-layout">
           <div class="card">
-            <div class="connection"><span></span>Project data access active</div>
+            <div class="connection"><span></span>Connected to this project</div>
             <div id="aiChat" class="chat" aria-live="polite"><div class="bubble">Try “Add two bamboo shafts to materials,” “Schedule contact Jeremy for Monday at 3pm,” or “Summarise my project.”</div></div>
-            <div class="ai-entry"><input id="aiInput" placeholder="Ask or tell the project AI to make a change"><button id="sendAI" class="primary">Send</button></div>
+            <div class="ai-entry"><input id="aiInput" placeholder="Ask or make a change"><button id="sendAI" class="primary" type="button">Send</button></div>
           </div>
-          <div class="card examples">
-            <h2>Example commands</h2>
-            <button data-prompt="Add two bamboo shafts to materials">Add a material</button>
-            <button data-prompt="Add research magnetic basket connectors to tasks">Add a task</button>
-            <button data-prompt="Schedule contact Jeremy for Monday at 3pm">Add a calendar event</button>
-            <button data-prompt="Add I learnt that HDPE can be made into flat sheets">Add a KWL note</button>
-            <button data-prompt="Summarise my project">Summarise everything</button>
-          </div>
+          <div class="card examples"><h2>Quick examples</h2><button type="button" data-prompt="Add two bamboo shafts to materials">Add material</button><button type="button" data-prompt="Add research magnetic basket connectors to tasks">Add task</button><button type="button" data-prompt="Schedule contact Jeremy for Monday at 3pm">Add event</button><button type="button" data-prompt="Add I learnt that HDPE can be made into flat sheets">Add learning</button><button type="button" data-prompt="Summarise my project">Summarise project</button></div>
         </div>
       </section>
     </main>
@@ -138,6 +142,5 @@
 
   <script src="app.js"></script>
   <script src="project-ai.js"></script>
-  <script src="https://my-assistant-bhre.vercel.app/widget.js" data-agent-id="neve69531-gmail-com" data-color="#5571e2" data-bg="#faf7f0" data-font="poppins" data-name="Ski Pole Project OS" data-greeting="Hi! How can I help you today?" data-business-email="neve69531@gmail.com"></script>
 </body>
 </html>
