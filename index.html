@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ski Pole Project OS</title>
+  <meta name="theme-color" content="#10261f">
+  <title>ParkScore Project OS</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">Ski Pole Project OS<small>Your project in one place</small></div>
+      <div class="brand">ParkScore Project OS<small>Ski park scoring-system tracker</small></div>
       <nav id="nav" class="nav" aria-label="Project sections"></nav>
     </aside>
 
@@ -17,104 +18,141 @@
       <section id="overview" class="page active">
         <div class="hero card">
           <div class="hero-copy">
-            <span class="eyebrow">Independent exploration</span>
-            <h1>One pole.<br>More possibility.</h1>
-            <p>A modular bamboo ski pole with interchangeable recycled-plastic baskets, built-in tool storage, and motion-sensor coaching.</p>
+            <span class="eyebrow">Independent project</span>
+            <h1>Score the run.<br>Improve the system.</h1>
+            <p>A personal workspace for designing, researching and testing a fair ski-park scoring system.</p>
             <div class="metrics">
-              <div class="metric"><strong id="metricMaterials">0</strong><span>Materials</span></div>
-              <div class="metric"><strong id="metricTasks">0</strong><span>Tasks</span></div>
-              <div class="metric"><strong id="metricEvents">0</strong><span>Events</span></div>
+              <div class="metric"><strong id="metricCriteria">0</strong><span>Scoring criteria</span></div>
+              <div class="metric"><strong id="metricTasks">0</strong><span>Open tasks</span></div>
+              <div class="metric"><strong id="metricEvents">0</strong><span>Upcoming events</span></div>
             </div>
           </div>
-          <div class="product-stage">
-            <div class="pole-wrap">
-              <img id="poleImage" src="ski-pole-concept.png" alt="3D modular bamboo ski pole concept">
-              <div id="imageFallback" class="image-fallback" hidden>Upload <code>ski-pole-concept.png</code> to show the animated ski pole.</div>
-            </div>
+          <div class="park-visual" aria-label="Stylised ski-park scoring illustration">
+            <div class="sky-label">LIVE TEST RUN</div>
+            <div class="score-card"><span>RUN SCORE</span><strong>87.4</strong><small>Prototype display</small></div>
+            <div class="mountain mountain-a"></div>
+            <div class="mountain mountain-b"></div>
+            <div class="slope"></div>
+            <div class="rail"></div>
+            <div class="kicker"></div>
+            <div class="skier" aria-hidden="true">⛷</div>
           </div>
+        </div>
+        <div class="overview-grid">
+          <article class="card focus-card"><span class="eyebrow">Current focus</span><h2 id="currentFocus"></h2><p id="currentNextStep"></p></article>
+          <article class="card weight-card"><div><span class="eyebrow">Scoring model</span><h2><span id="weightTotal">0</span>% allocated</h2></div><div class="weight-track"><span id="weightFill"></span></div><p id="weightMessage"></p></article>
         </div>
       </section>
 
       <section id="brief" class="page">
         <header class="page-head">
-          <div><h1>Project brief</h1><p>The main idea and direction of your project.</p></div>
+          <div><h1>Project brief</h1><p>The purpose, question and next direction of the project.</p></div>
           <button class="icon-text-button" type="button" data-action="edit-brief"><span>✎</span> Edit</button>
         </header>
         <div id="briefView" class="grid two"></div>
         <div id="briefEditor" class="card editor-panel" hidden>
           <div class="form-grid two">
-            <label>Title<input id="briefTitle"></label>
+            <label>Project title<input id="briefTitle"></label>
             <label>Driving question<textarea id="briefQuestion"></textarea></label>
             <label>Purpose<textarea id="briefPurpose"></textarea></label>
-            <label>Impact<textarea id="briefImpact"></textarea></label>
-            <label class="full">First steps<textarea id="briefSteps"></textarea></label>
+            <label>Intended impact<textarea id="briefImpact"></textarea></label>
+            <label class="full">Current focus<input id="briefFocus"></label>
+            <label class="full">Next steps<textarea id="briefSteps"></textarea></label>
           </div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="cancel-brief">Cancel</button><button class="primary" type="button" data-action="save-brief">Save changes</button></div>
         </div>
       </section>
 
-      <section id="materials" class="page">
+      <section id="scoring" class="page">
         <header class="page-head">
-          <div><h1>Materials</h1><p>Everything you need to build and test the pole.</p></div>
-          <button class="primary" type="button" data-action="open-add-material">+ Add material</button>
+          <div><h1>Scoring model</h1><p>Define what is judged and how much each criterion counts.</p></div>
+          <button class="primary" type="button" data-action="open-add-criterion">+ Add criterion</button>
         </header>
-        <div id="materialEditor" class="card editor-panel" hidden>
-          <h2 id="materialEditorTitle">Add material</h2>
-          <input id="materialEditId" type="hidden">
+        <div class="score-summary card"><div><strong id="criteriaWeightTotal">0%</strong><span>Total weighting</span></div><p id="criteriaWeightAdvice"></p></div>
+        <div id="criterionEditor" class="card editor-panel" hidden>
+          <h2 id="criterionEditorTitle">Add criterion</h2>
+          <input id="criterionEditId" type="hidden">
           <div class="form-grid two">
-            <label>Material<input id="materialName" placeholder="Bamboo shaft"></label>
-            <label>Quantity<input id="materialQty" placeholder="2 lengths"></label>
-            <label>Purpose<input id="materialPurpose" placeholder="Main pole shaft"></label>
-            <label>Status<select id="materialStatus"><option>Needed</option><option>Ordered</option><option>Have it</option><option>Tested</option></select></label>
-            <label class="full">Shop or reference link (optional)<input id="materialUrl" type="url" inputmode="url" placeholder="https://www.amazon.com/..."></label>
+            <label>Criterion<input id="criterionName" placeholder="Execution"></label>
+            <label>Weight (%)<input id="criterionWeight" type="number" min="0" max="100" step="1"></label>
+            <label>Status<select id="criterionStatus"><option>Draft</option><option>Testing</option><option>Locked</option></select></label>
+            <label class="full">What judges should look for<textarea id="criterionDescription"></textarea></label>
           </div>
-          <div class="editor-actions"><button class="secondary" type="button" data-action="close-material-editor">Cancel</button><button class="primary" type="button" data-action="save-material">Save material</button></div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-criterion-editor">Cancel</button><button class="primary" type="button" data-action="save-criterion">Save criterion</button></div>
         </div>
-        <div id="materialList" class="simple-list"></div>
-      </section>
-
-      <section id="kwl" class="page">
-        <header class="page-head"><div><h1>KWL</h1><p>Know, Want to know, and Learnt.</p></div></header>
-        <div id="kwlColumns" class="grid three"></div>
+        <div id="criterionList" class="criteria-grid"></div>
       </section>
 
       <section id="tasks" class="page">
         <header class="page-head">
-          <div><h1>Tasks</h1><p>Your next actions, kept simple.</p></div>
+          <div><h1>Tasks</h1><p>The work needed to move the scoring system forward.</p></div>
           <button class="primary" type="button" data-action="open-add-task">+ Add task</button>
         </header>
         <div id="taskEditor" class="card editor-panel" hidden>
           <h2 id="taskEditorTitle">Add task</h2>
           <input id="taskEditId" type="hidden">
-          <div class="form-grid two"><label>Task<input id="taskText"></label><label>Stage<select id="taskStage"><option>Research</option><option>Design</option><option>Prototype</option><option>Test</option><option>Done</option></select></label></div>
+          <div class="form-grid two">
+            <label>Task<input id="taskText"></label>
+            <label>Stage<select id="taskStage"><option>Research</option><option>Design</option><option>Prototype</option><option>Test</option><option>Done</option></select></label>
+            <label>Priority<select id="taskPriority"><option>High</option><option>Medium</option><option>Low</option></select></label>
+          </div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="close-task-editor">Cancel</button><button class="primary" type="button" data-action="save-task">Save task</button></div>
         </div>
         <div id="taskList" class="simple-list"></div>
       </section>
 
-      <section id="sources" class="page">
+      <section id="research" class="page">
         <header class="page-head">
-          <div><h1>Sources</h1><p>Evidence and what each source proves.</p></div>
-          <button class="primary" type="button" data-action="open-add-source">+ Add source</button>
+          <div><h1>Research & links</h1><p>Save judging systems, articles, videos and evidence.</p></div>
+          <button class="primary" type="button" data-action="open-add-research">+ Add research</button>
         </header>
-        <div id="sourceEditor" class="card editor-panel" hidden>
-          <h2 id="sourceEditorTitle">Add source</h2>
-          <input id="sourceEditId" type="hidden">
-          <div class="form-grid two"><label>Title<input id="sourceTitle"></label><label>Link<input id="sourceUrl" type="url"></label><label class="full">What it proves<textarea id="sourceClaim"></textarea></label></div>
-          <div class="editor-actions"><button class="secondary" type="button" data-action="close-source-editor">Cancel</button><button class="primary" type="button" data-action="save-source">Save source</button></div>
+        <div id="researchEditor" class="card editor-panel" hidden>
+          <h2 id="researchEditorTitle">Add research</h2>
+          <input id="researchEditId" type="hidden">
+          <div class="form-grid two">
+            <label>Title<input id="researchTitle"></label>
+            <label>Link<input id="researchUrl" type="url" inputmode="url" placeholder="https://..."></label>
+            <label>Status<select id="researchStatus"><option>To review</option><option>Useful</option><option>Used in project</option></select></label>
+            <label class="full">What it shows<textarea id="researchNote"></textarea></label>
+          </div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-research-editor">Cancel</button><button class="primary" type="button" data-action="save-research">Save research</button></div>
         </div>
-        <div id="sourceList" class="simple-list"></div>
+        <div id="researchList" class="simple-list"></div>
+      </section>
+
+      <section id="log" class="page">
+        <header class="page-head">
+          <div><h1>Ideas & testing</h1><p>Keep design ideas, test results, decisions and learning together.</p></div>
+          <button class="primary" type="button" data-action="open-add-log">+ Add entry</button>
+        </header>
+        <div id="logEditor" class="card editor-panel" hidden>
+          <h2 id="logEditorTitle">Add entry</h2>
+          <input id="logEditId" type="hidden">
+          <div class="form-grid two">
+            <label>Type<select id="logType"><option>Idea</option><option>Test</option><option>Decision</option><option>Learning</option></select></label>
+            <label>Title<input id="logTitle"></label>
+            <label class="full">Notes<textarea id="logNotes"></textarea></label>
+            <label class="full">Result or next action<textarea id="logResult"></textarea></label>
+          </div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-log-editor">Cancel</button><button class="primary" type="button" data-action="save-log">Save entry</button></div>
+        </div>
+        <div id="logList" class="simple-list"></div>
       </section>
 
       <section id="calendar" class="page">
         <header class="page-head">
-          <div><h1>Calendar</h1><p>Deadlines, meetings, build sessions, and tests.</p></div>
+          <div><h1>Calendar</h1><p>Deadlines, interviews, prototype sessions and scoring tests.</p></div>
           <button class="primary" type="button" data-action="open-add-event">+ Add event</button>
         </header>
         <div id="eventEditor" class="card editor-panel" hidden>
           <h2 id="eventEditorTitle">Add event</h2>
           <input id="eventEditId" type="hidden">
-          <div class="form-grid two"><label>Title<input id="eventTitle"></label><label>Date<input id="eventDate" type="date"></label><label>Time<input id="eventTime" type="time"></label><label>Type<select id="eventType"><option>Deadline</option><option>Meeting</option><option>Build</option><option>Testing</option><option>General</option></select></label></div>
+          <div class="form-grid two">
+            <label>Title<input id="eventTitle"></label>
+            <label>Date<input id="eventDate" type="date"></label>
+            <label>Time<input id="eventTime" type="time"></label>
+            <label>Type<select id="eventType"><option>Deadline</option><option>Meeting</option><option>Research</option><option>Prototype</option><option>Testing</option><option>General</option></select></label>
+          </div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="close-event-editor">Cancel</button><button class="primary" type="button" data-action="save-event">Save event</button></div>
         </div>
         <div class="calendar-layout">
@@ -126,20 +164,20 @@
           <div class="card"><h2>Upcoming</h2><div id="upcomingList" class="simple-list compact"></div></div>
         </div>
       </section>
-
-      <section id="ai" class="page">
-        <header class="page-head"><div><h1>Project AI</h1><p>Ask questions or tell it to update your project.</p></div></header>
-        <div class="ai-layout">
-          <div class="card">
-            <div class="connection"><span></span>Connected to this project</div>
-            <div id="aiChat" class="chat" aria-live="polite"><div class="bubble">Try “Add two bamboo shafts to materials,” “Schedule contact Jeremy for Monday at 3pm,” or “Summarise my project.”</div></div>
-            <div class="ai-entry"><input id="aiInput" placeholder="Ask or make a change"><button id="sendAI" class="primary" type="button">Send</button></div>
-          </div>
-          <div class="card examples"><h2>Quick examples</h2><button type="button" data-prompt="Add two bamboo shafts to materials">Add material</button><button type="button" data-prompt="Add research magnetic basket connectors to tasks">Add task</button><button type="button" data-prompt="Schedule contact Jeremy for Monday at 3pm">Add event</button><button type="button" data-prompt="Add I learnt that HDPE can be made into flat sheets">Add learning</button><button type="button" data-prompt="Summarise my project">Summarise project</button></div>
-        </div>
-      </section>
     </main>
   </div>
+
+  <button id="aiToggle" class="ai-toggle" type="button" aria-expanded="false" aria-controls="aiPanel">✦ Project AI</button>
+  <aside id="aiPanel" class="ai-panel" hidden aria-label="Project AI">
+    <div class="ai-panel-head"><div><strong>Project AI</strong><small>Can read and update this project</small></div><button id="aiClose" class="icon-button" type="button" aria-label="Close Project AI">×</button></div>
+    <div id="aiChat" class="chat" aria-live="polite"><div class="bubble">Try “Add test sample runs with three judges to tasks” or “Schedule scoring prototype test for next Friday at 3pm.”</div></div>
+    <div class="quick-prompts">
+      <button type="button" data-prompt="Summarise my project">Summarise</button>
+      <button type="button" data-prompt="What should I do next?">Next step</button>
+      <button type="button" data-prompt="List my scoring criteria">Criteria</button>
+    </div>
+    <div class="ai-entry"><input id="aiInput" placeholder="Ask or make a project change"><button id="sendAI" class="primary" type="button">Send</button></div>
+  </aside>
 
   <script src="app.js"></script>
   <script src="project-ai.js"></script>
