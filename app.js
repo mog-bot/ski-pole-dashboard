@@ -2,43 +2,205 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const clone=value=>JSON.parse(JSON.stringify(value));
+const STORAGE_KEY='parkScoreProjectOS_v1';
 const defaults={
-  brief:{title:'Reimagining the ski pole for more effective use',purpose:'Use the unused space inside a ski pole to combine useful tools, interchangeable components and skiing feedback.',impact:'Create a useful product for skiers, reduce plastic waste, and learn how physical components and AI can work together.',question:'How might I reimagine the ski pole to reduce environmental impact, help skiers improve, and allow them to carry less gear?',steps:'Create success criteria and a materials list. Contact Jeremy. Research basket attachment systems, recycled plastic, sensors and AI coaching.'},
-  materials:[{id:1,name:'Bamboo shaft',qty:'2 lengths',purpose:'Main pole body',status:'Needed',url:''},{id:2,name:'Recycled HDPE sheet',qty:'1 sheet',purpose:'Prototype basket',status:'Needed',url:''},{id:3,name:'Ski-pole ferrule and tip',qty:'1 set',purpose:'Lower pole connection',status:'Needed',url:''}],
-  kwl:{know:['A ski pole needs a handle, strong shaft, basket and tip.','A recycled-plastic basket can be prototyped from a flat sheet.'],want:['How can baskets be quickly swapped?','How can sensors give useful skiing feedback?'],learnt:[]},
-  tasks:[{id:11,text:'Research current ski-pole basket connectors',stage:'Research'},{id:12,text:'Contact Jeremy',stage:'Research'},{id:13,text:'Prototype a recycled-plastic basket',stage:'Prototype'}],
-  sources:[],events:[]
+  brief:{
+    title:'AI Ski Park Scoring System',
+    purpose:'Design a clear and fair system that can score ski-park runs and explain why a run received its result.',
+    impact:'Help riders understand their performance, make judging more consistent, and explore how AI could support human scoring.',
+    question:'How might I create a ski-park scoring system that is fair, understandable and useful for both riders and judges?',
+    focus:'Define the first scoring model and test it against sample runs.',
+    steps:'Finish the scoring criteria and weights. Create several sample runs. Compare scores from different people. Record where the system feels unclear or unfair.'
+  },
+  criteria:[
+    {id:101,name:'Execution',weight:25,description:'How cleanly and confidently the tricks and movements are completed.',status:'Draft'},
+    {id:102,name:'Difficulty',weight:25,description:'The technical challenge and risk of the tricks, line and combinations.',status:'Draft'},
+    {id:103,name:'Style & control',weight:20,description:'Body control, creativity, flow and how intentional the run looks.',status:'Draft'},
+    {id:104,name:'Landing',weight:20,description:'Stability, balance and control when finishing each feature or trick.',status:'Draft'},
+    {id:105,name:'Use of features',weight:10,description:'How effectively the rider uses the available park features and line.',status:'Draft'}
+  ],
+  tasks:[
+    {id:201,text:'Research how existing ski-park competitions are judged',stage:'Research',priority:'High'},
+    {id:202,text:'Define the first scoring categories and weights',stage:'Design',priority:'High'},
+    {id:203,text:'Create sample runs for scoring tests',stage:'Prototype',priority:'Medium'},
+    {id:204,text:'Test whether different judges produce similar scores',stage:'Test',priority:'Medium'}
+  ],
+  research:[
+    {id:301,title:'Existing competition judging systems',url:'',note:'Compare the categories, scoring ranges and explanations used by current events.',status:'To review'}
+  ],
+  log:[
+    {id:401,type:'Idea',title:'Explain every score',notes:'Show the total score and the contribution from each category.',result:'Prototype a score breakdown card.'}
+  ],
+  events:[]
 };
-let state;let monthCursor=new Date();
-function load(){try{const raw=JSON.parse(localStorage.getItem('skiPoleOS')||'null');if(!raw)return clone(defaults);return{brief:{...defaults.brief,...(raw.brief||{})},materials:Array.isArray(raw.materials)?raw.materials.map(m=>({...m,url:m.url||''})):clone(defaults.materials),kwl:{know:raw.kwl?.know||clone(defaults.kwl.know),want:raw.kwl?.want||clone(defaults.kwl.want),learnt:raw.kwl?.learnt||[]},tasks:Array.isArray(raw.tasks)?raw.tasks:clone(defaults.tasks),sources:Array.isArray(raw.sources)?raw.sources:[],events:Array.isArray(raw.events)?raw.events:[]}}catch(error){console.error(error);return clone(defaults)}}
-function save(){localStorage.setItem('skiPoleOS',JSON.stringify(state));renderAll()}
-function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function safeUrl(value){const raw=String(value||'').trim();if(!raw)return'';const candidate=/^https?:\/\//i.test(raw)?raw:`https://${raw}`;try{const parsed=new URL(candidate);return/^https?:$/.test(parsed.protocol)?parsed.href:''}catch(error){return''}}
-function id(){return Date.now()+Math.floor(Math.random()*10000)}
-function iso(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function showEditor(editorId,show=true){$(editorId).hidden=!show;if(show)$(editorId).scrollIntoView({behavior:'smooth',block:'nearest'})}
-function initNav(){const tabs=[['overview','Overview'],['brief','Project brief'],['materials','Materials'],['kwl','KWL'],['tasks','Tasks'],['sources','Sources'],['calendar','Calendar'],['ai','Project AI']];$('nav').innerHTML=tabs.map((tab,index)=>`<button type="button" class="${index===0?'active':''}" data-page="${tab[0]}">${tab[1]}</button>`).join('')}
-function renderBrief(){const b=state.brief;$('briefView').innerHTML=`<article class="card"><h2>${esc(b.title)}</h2><p><strong>Purpose</strong><br>${esc(b.purpose)}</p><p><strong>Impact</strong><br>${esc(b.impact)}</p></article><article class="card"><p><strong>Driving question</strong><br>${esc(b.question)}</p><p><strong>First steps</strong><br>${esc(b.steps)}</p></article>`}
-function materialRecord(m){const url=safeUrl(m.url);return`<article class="record"><div class="record-main"><strong>${esc(m.name)}</strong><p>${esc(m.qty||'No quantity')} · ${esc(m.purpose||'No purpose')}</p><span class="badge">${esc(m.status||'Needed')}</span>${url?`<a class="material-link" href="${esc(url)}" target="_blank" rel="noopener">Open material link ↗</a>`:''}</div><div class="record-actions"><button type="button" class="icon-button" data-edit-material="${m.id}" aria-label="Edit ${esc(m.name)}">✎</button><button type="button" class="icon-button" data-delete-material="${m.id}" aria-label="Delete ${esc(m.name)}">×</button></div></article>`}
-function renderMaterials(){$('materialList').innerHTML=state.materials.length?state.materials.map(materialRecord).join(''):'<div class="empty">No materials yet. Click “Add material”.</div>'}
-function renderKWL(){const names={know:'Know',want:'Want to know',learnt:'Learnt'};$('kwlColumns').innerHTML=['know','want','learnt'].map(kind=>`<article class="card"><div class="column-head"><h2>${names[kind]}</h2><button type="button" class="small-add" data-open-kwl="${kind}">+ Add</button></div><div id="${kind}Add" class="kwl-add" hidden><input id="${kind}New" placeholder="Type your note"><div class="editor-actions"><button type="button" class="secondary" data-close-kwl="${kind}">Cancel</button><button type="button" class="primary" data-save-kwl="${kind}">Save</button></div></div><div class="simple-list">${state.kwl[kind].length?state.kwl[kind].map((text,index)=>`<div class="record"><div class="record-main"><p>${esc(text)}</p></div><div class="record-actions"><button type="button" class="icon-button" data-edit-kwl="${kind}:${index}" aria-label="Edit note">✎</button><button type="button" class="icon-button" data-delete-kwl="${kind}:${index}" aria-label="Delete note">×</button></div></div>`).join(''):'<div class="empty">Nothing here yet.</div>'}</div></article>`).join('')}
-function renderTasks(){$('taskList').innerHTML=state.tasks.length?state.tasks.map(t=>`<article class="record"><div class="record-main"><strong>${esc(t.text)}</strong><br><span class="badge">${esc(t.stage)}</span></div><div class="record-actions"><button type="button" class="icon-button" data-edit-task="${t.id}" aria-label="Edit task">✎</button><button type="button" class="icon-button" data-delete-task="${t.id}" aria-label="Delete task">×</button></div></article>`).join(''):'<div class="empty">No tasks yet. Click “Add task”.</div>'}
-function renderSources(){$('sourceList').innerHTML=state.sources.length?state.sources.map(s=>`<article class="record"><div class="record-main"><strong>${esc(s.title)}</strong><p>${esc(s.claim||'No note added.')}</p>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">Open source</a>`:''}</div><div class="record-actions"><button type="button" class="icon-button" data-edit-source="${s.id}" aria-label="Edit source">✎</button><button type="button" class="icon-button" data-delete-source="${s.id}" aria-label="Delete source">×</button></div></article>`).join(''):'<div class="empty">No sources yet. Click “Add source”.</div>'}
-function renderCalendar(){const first=new Date(monthCursor.getFullYear(),monthCursor.getMonth(),1),offset=(first.getDay()+6)%7,start=new Date(first);start.setDate(first.getDate()-offset);const today=iso(new Date());$('monthLabel').textContent=monthCursor.toLocaleDateString('en-NZ',{month:'long',year:'numeric'});$('calendarGrid').innerHTML='';for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const date=iso(d),events=state.events.filter(e=>e.date===date),button=document.createElement('button');button.type='button';button.className=`day ${d.getMonth()!==monthCursor.getMonth()?'outside ':''}${date===today?'today':''}`;button.dataset.pickDate=date;button.innerHTML=`<strong>${d.getDate()}</strong>${events.map(e=>`<span class="event-chip">${esc(e.time||'')} ${esc(e.title)}</span>`).join('')}`;$('calendarGrid').appendChild(button)}const upcoming=state.events.filter(e=>e.date>=today).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||''))).slice(0,12);$('upcomingList').innerHTML=upcoming.length?upcoming.map(e=>`<article class="record"><div class="record-main"><strong>${esc(e.title)}</strong><p>${esc(e.date)} ${esc(e.time||'')} · ${esc(e.type)}</p></div><div class="record-actions"><button type="button" class="icon-button" data-edit-event="${e.id}" aria-label="Edit event">✎</button><button type="button" class="icon-button" data-delete-event="${e.id}" aria-label="Delete event">×</button></div></article>`).join(''):'<div class="empty">No upcoming events.</div>'}
-function renderAll(){renderBrief();renderMaterials();renderKWL();renderTasks();renderSources();renderCalendar();$('metricMaterials').textContent=state.materials.length;$('metricTasks').textContent=state.tasks.length;$('metricEvents').textContent=state.events.length}
-function openBrief(){const b=state.brief;$('briefTitle').value=b.title;$('briefPurpose').value=b.purpose;$('briefImpact').value=b.impact;$('briefQuestion').value=b.question;$('briefSteps').value=b.steps;showEditor('briefEditor')}
-function openMaterial(item=null){$('materialEditorTitle').textContent=item?'Edit material':'Add material';$('materialEditId').value=item?.id||'';$('materialName').value=item?.name||'';$('materialQty').value=item?.qty||'';$('materialPurpose').value=item?.purpose||'';$('materialStatus').value=item?.status||'Needed';$('materialUrl').value=item?.url||'';showEditor('materialEditor')}
-function openTask(item=null){$('taskEditorTitle').textContent=item?'Edit task':'Add task';$('taskEditId').value=item?.id||'';$('taskText').value=item?.text||'';$('taskStage').value=item?.stage||'Research';showEditor('taskEditor')}
-function openSource(item=null){$('sourceEditorTitle').textContent=item?'Edit source':'Add source';$('sourceEditId').value=item?.id||'';$('sourceTitle').value=item?.title||'';$('sourceUrl').value=item?.url||'';$('sourceClaim').value=item?.claim||'';showEditor('sourceEditor')}
-function openEvent(item=null,date=''){const today=iso(new Date());$('eventEditorTitle').textContent=item?'Edit event':'Add event';$('eventEditId').value=item?.id||'';$('eventTitle').value=item?.title||'';$('eventDate').value=item?.date||date||today;$('eventTime').value=item?.time||'';$('eventType').value=item?.type||'General';showEditor('eventEditor')}
-function handleClick(event){const target=event.target.closest('button');if(!target)return;const action=target.dataset.action;if(target.dataset.page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('[data-page]').forEach(b=>b.classList.remove('active'));$(target.dataset.page).classList.add('active');target.classList.add('active');return}
-if(action==='edit-brief')return openBrief();if(action==='cancel-brief')return showEditor('briefEditor',false);if(action==='save-brief'){state.brief={title:$('briefTitle').value.trim(),purpose:$('briefPurpose').value.trim(),impact:$('briefImpact').value.trim(),question:$('briefQuestion').value.trim(),steps:$('briefSteps').value.trim()};showEditor('briefEditor',false);return save()}
-if(action==='open-add-material')return openMaterial();if(action==='close-material-editor')return showEditor('materialEditor',false);if(action==='save-material'){const name=$('materialName').value.trim();if(!name)return alert('Please add a material name.');const editId=$('materialEditId').value;const enteredUrl=$('materialUrl').value.trim();const data={name,qty:$('materialQty').value.trim(),purpose:$('materialPurpose').value.trim(),status:$('materialStatus').value,url:enteredUrl};if(enteredUrl&&!safeUrl(enteredUrl))return alert('Please enter a valid web link.');if(editId){const item=state.materials.find(x=>String(x.id)===editId);if(item)Object.assign(item,data)}else state.materials.push({id:id(),...data});showEditor('materialEditor',false);return save()}
-if(target.dataset.editMaterial){const item=state.materials.find(x=>String(x.id)===target.dataset.editMaterial);if(item)return openMaterial(item)}if(target.dataset.deleteMaterial){state.materials=state.materials.filter(x=>String(x.id)!==target.dataset.deleteMaterial);return save()}
-if(target.dataset.openKwl){$(target.dataset.openKwl+'Add').hidden=false;$(target.dataset.openKwl+'New').focus();return}if(target.dataset.closeKwl){$(target.dataset.closeKwl+'Add').hidden=true;return}if(target.dataset.saveKwl){const kind=target.dataset.saveKwl,input=$(kind+'New'),value=input.value.trim();if(value){state.kwl[kind].push(value);return save()}return}if(target.dataset.editKwl){const[kind,indexText]=target.dataset.editKwl.split(':'),index=Number(indexText),current=state.kwl[kind][index],next=prompt('Edit this note:',current);if(next!==null&&next.trim()){state.kwl[kind][index]=next.trim();return save()}}if(target.dataset.deleteKwl){const[kind,indexText]=target.dataset.deleteKwl.split(':');state.kwl[kind].splice(Number(indexText),1);return save()}
-if(action==='open-add-task')return openTask();if(action==='close-task-editor')return showEditor('taskEditor',false);if(action==='save-task'){const text=$('taskText').value.trim();if(!text)return alert('Please add a task.');const editId=$('taskEditId').value,data={text,stage:$('taskStage').value};if(editId){const item=state.tasks.find(x=>String(x.id)===editId);if(item)Object.assign(item,data)}else state.tasks.push({id:id(),...data});showEditor('taskEditor',false);return save()}if(target.dataset.editTask){const item=state.tasks.find(x=>String(x.id)===target.dataset.editTask);if(item)return openTask(item)}if(target.dataset.deleteTask){state.tasks=state.tasks.filter(x=>String(x.id)!==target.dataset.deleteTask);return save()}
-if(action==='open-add-source')return openSource();if(action==='close-source-editor')return showEditor('sourceEditor',false);if(action==='save-source'){const title=$('sourceTitle').value.trim();if(!title)return alert('Please add a source title.');const editId=$('sourceEditId').value,data={title,url:$('sourceUrl').value.trim(),claim:$('sourceClaim').value.trim()};if(editId){const item=state.sources.find(x=>String(x.id)===editId);if(item)Object.assign(item,data)}else state.sources.push({id:id(),...data});showEditor('sourceEditor',false);return save()}if(target.dataset.editSource){const item=state.sources.find(x=>String(x.id)===target.dataset.editSource);if(item)return openSource(item)}if(target.dataset.deleteSource){state.sources=state.sources.filter(x=>String(x.id)!==target.dataset.deleteSource);return save()}
-if(action==='open-add-event')return openEvent();if(action==='close-event-editor')return showEditor('eventEditor',false);if(action==='save-event'){const title=$('eventTitle').value.trim(),date=$('eventDate').value;if(!title||!date)return alert('Please add an event title and date.');const editId=$('eventEditId').value,data={title,date,time:$('eventTime').value,type:$('eventType').value};if(editId){const item=state.events.find(x=>String(x.id)===editId);if(item)Object.assign(item,data)}else state.events.push({id:id(),...data});monthCursor=new Date(date+'T12:00:00');showEditor('eventEditor',false);return save()}if(target.dataset.editEvent){const item=state.events.find(x=>String(x.id)===target.dataset.editEvent);if(item)return openEvent(item)}if(target.dataset.deleteEvent){state.events=state.events.filter(x=>String(x.id)!==target.dataset.deleteEvent);return save()}if(target.dataset.pickDate)return openEvent(null,target.dataset.pickDate)}
-function init(){state=load();initNav();document.addEventListener('click',handleClick);$('previousMonth').addEventListener('click',()=>{monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()-1,1);renderCalendar()});$('nextMonth').addEventListener('click',()=>{monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()+1,1);renderCalendar()});$('poleImage').addEventListener('error',()=>{$('poleImage').hidden=true;$('imageFallback').hidden=false});window.ProjectOS={getState:()=>state,save,makeId:id,localISO:iso,setMonth:d=>{monthCursor=new Date(d.getFullYear(),d.getMonth(),1)},renderAll};renderAll();window.dispatchEvent(new Event('ProjectOSReady'))}
+let state;
+let monthCursor=new Date();
+
+function load(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+    if(!saved)return clone(defaults);
+    return{
+      brief:{...defaults.brief,...(saved.brief||{})},
+      criteria:Array.isArray(saved.criteria)?saved.criteria:clone(defaults.criteria),
+      tasks:Array.isArray(saved.tasks)?saved.tasks:clone(defaults.tasks),
+      research:Array.isArray(saved.research)?saved.research:clone(defaults.research),
+      log:Array.isArray(saved.log)?saved.log:clone(defaults.log),
+      events:Array.isArray(saved.events)?saved.events:[]
+    };
+  }catch(error){
+    console.error('Could not load project data',error);
+    return clone(defaults);
+  }
+}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));renderAll()}
+function makeId(){return Date.now()+Math.floor(Math.random()*10000)}
+function localISO(date){return`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`}
+function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
+function safeUrl(value){
+  const raw=String(value||'').trim();
+  if(!raw)return'';
+  const candidate=/^https?:\/\//i.test(raw)?raw:`https://${raw}`;
+  try{const url=new URL(candidate);return/^https?:$/.test(url.protocol)?url.href:''}catch(error){return''}
+}
+function showEditor(id,show=true){$(id).hidden=!show;if(show)$(id).scrollIntoView({behavior:'smooth',block:'nearest'})}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(page=>page.classList.remove('active'));
+  document.querySelectorAll('[data-page]').forEach(button=>button.classList.toggle('active',button.dataset.page===id));
+  const page=$(id);if(page)page.classList.add('active');
+}
+function initNav(){
+  const tabs=[['overview','Overview'],['brief','Project brief'],['scoring','Scoring model'],['tasks','Tasks'],['research','Research & links'],['log','Ideas & testing'],['calendar','Calendar']];
+  $('nav').innerHTML=tabs.map((tab,index)=>`<button type="button" class="${index===0?'active':''}" data-page="${tab[0]}">${tab[1]}</button>`).join('');
+}
+function renderOverview(){
+  const totalWeight=state.criteria.reduce((sum,item)=>sum+Number(item.weight||0),0);
+  const openTasks=state.tasks.filter(task=>task.stage!=='Done').length;
+  const today=localISO(new Date());
+  const upcoming=state.events.filter(event=>event.date>=today).length;
+  $('metricCriteria').textContent=state.criteria.length;
+  $('metricTasks').textContent=openTasks;
+  $('metricEvents').textContent=upcoming;
+  $('currentFocus').textContent=state.brief.focus||'Choose the next project focus.';
+  $('currentNextStep').textContent=state.brief.steps||'Add a next step in the project brief.';
+  $('weightTotal').textContent=totalWeight;
+  $('weightFill').style.width=`${Math.min(totalWeight,100)}%`;
+  $('weightMessage').textContent=totalWeight===100?'The current model adds up to 100%.':totalWeight<100?`${100-totalWeight}% is still unallocated.`:`The model is ${totalWeight-100}% over 100%.`;
+}
+function renderBrief(){
+  const brief=state.brief;
+  $('briefView').innerHTML=`
+    <article class="card"><h2>${esc(brief.title)}</h2><p><strong>Purpose</strong><br>${esc(brief.purpose)}</p><p><strong>Intended impact</strong><br>${esc(brief.impact)}</p></article>
+    <article class="card"><p><strong>Driving question</strong><br>${esc(brief.question)}</p><p><strong>Current focus</strong><br>${esc(brief.focus)}</p><p><strong>Next steps</strong><br>${esc(brief.steps)}</p></article>`;
+}
+function renderCriteria(){
+  const total=state.criteria.reduce((sum,item)=>sum+Number(item.weight||0),0);
+  $('criteriaWeightTotal').textContent=`${total}%`;
+  $('criteriaWeightAdvice').textContent=total===100?'Ready for a balanced test.':total<100?`Add or increase ${100-total}% before testing the full model.`:`Reduce the total by ${total-100}% before testing.`;
+  $('criterionList').innerHTML=state.criteria.length?state.criteria.map(item=>`
+    <article class="criterion-card">
+      <div class="criterion-weight">${Number(item.weight||0)}%</div>
+      <h2>${esc(item.name)}</h2>
+      <p>${esc(item.description||'No description yet.')}</p>
+      <span class="badge">${esc(item.status||'Draft')}</span>
+      <div class="criterion-actions"><button class="icon-button" type="button" data-edit-criterion="${item.id}" aria-label="Edit ${esc(item.name)}">✎</button><button class="icon-button" type="button" data-delete-criterion="${item.id}" aria-label="Delete ${esc(item.name)}">×</button></div>
+    </article>`).join(''):'<div class="empty">No scoring criteria yet. Add the first one.</div>';
+}
+function taskRecord(task){
+  const priorityClass=task.priority==='High'?'high':'';
+  const doneClass=task.stage==='Done'?'done':'';
+  return`<article class="record"><div class="record-main"><strong>${esc(task.text)}</strong><br><span class="badge ${doneClass}">${esc(task.stage)}</span><span class="badge ${priorityClass}">${esc(task.priority)} priority</span></div><div class="record-actions"><button class="icon-button" type="button" data-edit-task="${task.id}" aria-label="Edit task">✎</button><button class="icon-button" type="button" data-delete-task="${task.id}" aria-label="Delete task">×</button></div></article>`;
+}
+function renderTasks(){$('taskList').innerHTML=state.tasks.length?state.tasks.map(taskRecord).join(''):'<div class="empty">No tasks yet. Add the first one.</div>'}
+function renderResearch(){
+  $('researchList').innerHTML=state.research.length?state.research.map(item=>{
+    const url=safeUrl(item.url);
+    return`<article class="record"><div class="record-main"><strong>${esc(item.title)}</strong><p>${esc(item.note||'No notes yet.')}</p><span class="badge">${esc(item.status||'To review')}</span>${url?`<a href="${esc(url)}" target="_blank" rel="noopener">Open link ↗</a>`:''}</div><div class="record-actions"><button class="icon-button" type="button" data-edit-research="${item.id}" aria-label="Edit research">✎</button><button class="icon-button" type="button" data-delete-research="${item.id}" aria-label="Delete research">×</button></div></article>`;
+  }).join(''):'<div class="empty">No research saved yet.</div>';
+}
+function renderLog(){
+  $('logList').innerHTML=state.log.length?state.log.map(item=>`<article class="record"><div class="record-main"><strong>${esc(item.title)}</strong><br><span class="badge">${esc(item.type)}</span><p>${esc(item.notes||'No notes yet.')}</p>${item.result?`<p><strong>Result / next action:</strong> ${esc(item.result)}</p>`:''}</div><div class="record-actions"><button class="icon-button" type="button" data-edit-log="${item.id}" aria-label="Edit entry">✎</button><button class="icon-button" type="button" data-delete-log="${item.id}" aria-label="Delete entry">×</button></div></article>`).join(''):'<div class="empty">No ideas or test results yet.</div>';
+}
+function renderCalendar(){
+  const first=new Date(monthCursor.getFullYear(),monthCursor.getMonth(),1);
+  const offset=(first.getDay()+6)%7;
+  const start=new Date(first);start.setDate(first.getDate()-offset);
+  const today=localISO(new Date());
+  $('monthLabel').textContent=monthCursor.toLocaleDateString('en-NZ',{month:'long',year:'numeric'});
+  $('calendarGrid').innerHTML='';
+  for(let index=0;index<42;index++){
+    const dateObject=new Date(start);dateObject.setDate(start.getDate()+index);
+    const date=localISO(dateObject);
+    const events=state.events.filter(event=>event.date===date);
+    const button=document.createElement('button');
+    button.type='button';button.dataset.pickDate=date;
+    button.className=`day ${dateObject.getMonth()!==monthCursor.getMonth()?'outside ':''}${date===today?'today':''}`;
+    button.innerHTML=`<strong>${dateObject.getDate()}</strong>${events.map(event=>`<span class="event-chip">${esc(event.time||'')} ${esc(event.title)}</span>`).join('')}`;
+    $('calendarGrid').appendChild(button);
+  }
+  const upcoming=state.events.filter(event=>event.date>=today).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||''))).slice(0,12);
+  $('upcomingList').innerHTML=upcoming.length?upcoming.map(event=>`<article class="record"><div class="record-main"><strong>${esc(event.title)}</strong><p>${esc(event.date)} ${esc(event.time||'')} · ${esc(event.type)}</p></div><div class="record-actions"><button class="icon-button" type="button" data-edit-event="${event.id}" aria-label="Edit event">✎</button><button class="icon-button" type="button" data-delete-event="${event.id}" aria-label="Delete event">×</button></div></article>`).join(''):'<div class="empty">No upcoming events.</div>';
+}
+function renderAll(){renderOverview();renderBrief();renderCriteria();renderTasks();renderResearch();renderLog();renderCalendar()}
+
+function openBrief(){const item=state.brief;$('briefTitle').value=item.title;$('briefQuestion').value=item.question;$('briefPurpose').value=item.purpose;$('briefImpact').value=item.impact;$('briefFocus').value=item.focus;$('briefSteps').value=item.steps;showEditor('briefEditor')}
+function openCriterion(item=null){$('criterionEditorTitle').textContent=item?'Edit criterion':'Add criterion';$('criterionEditId').value=item?.id||'';$('criterionName').value=item?.name||'';$('criterionWeight').value=item?.weight??'';$('criterionStatus').value=item?.status||'Draft';$('criterionDescription').value=item?.description||'';showEditor('criterionEditor')}
+function openTask(item=null){$('taskEditorTitle').textContent=item?'Edit task':'Add task';$('taskEditId').value=item?.id||'';$('taskText').value=item?.text||'';$('taskStage').value=item?.stage||'Research';$('taskPriority').value=item?.priority||'Medium';showEditor('taskEditor')}
+function openResearch(item=null){$('researchEditorTitle').textContent=item?'Edit research':'Add research';$('researchEditId').value=item?.id||'';$('researchTitle').value=item?.title||'';$('researchUrl').value=item?.url||'';$('researchStatus').value=item?.status||'To review';$('researchNote').value=item?.note||'';showEditor('researchEditor')}
+function openLog(item=null){$('logEditorTitle').textContent=item?'Edit entry':'Add entry';$('logEditId').value=item?.id||'';$('logType').value=item?.type||'Idea';$('logTitle').value=item?.title||'';$('logNotes').value=item?.notes||'';$('logResult').value=item?.result||'';showEditor('logEditor')}
+function openEvent(item=null,date=''){const today=localISO(new Date());$('eventEditorTitle').textContent=item?'Edit event':'Add event';$('eventEditId').value=item?.id||'';$('eventTitle').value=item?.title||'';$('eventDate').value=item?.date||date||today;$('eventTime').value=item?.time||'';$('eventType').value=item?.type||'General';showEditor('eventEditor')}
+function shouldDelete(label){return window.confirm(`Delete ${label}?`)}
+
+function handleClick(event){
+  const button=event.target.closest('button');if(!button)return;
+  if(button.dataset.page){showPage(button.dataset.page);return}
+  const action=button.dataset.action;
+  if(action==='edit-brief')return openBrief();
+  if(action==='cancel-brief')return showEditor('briefEditor',false);
+  if(action==='save-brief'){state.brief={title:$('briefTitle').value.trim(),question:$('briefQuestion').value.trim(),purpose:$('briefPurpose').value.trim(),impact:$('briefImpact').value.trim(),focus:$('briefFocus').value.trim(),steps:$('briefSteps').value.trim()};showEditor('briefEditor',false);return save()}
+
+  if(action==='open-add-criterion')return openCriterion();
+  if(action==='close-criterion-editor')return showEditor('criterionEditor',false);
+  if(action==='save-criterion'){
+    const name=$('criterionName').value.trim();const weight=Number($('criterionWeight').value);
+    if(!name)return alert('Please add a criterion name.');if(!Number.isFinite(weight)||weight<0||weight>100)return alert('Weight must be between 0 and 100.');
+    const data={name,weight,description:$('criterionDescription').value.trim(),status:$('criterionStatus').value};const editId=$('criterionEditId').value;
+    if(editId){const item=state.criteria.find(entry=>String(entry.id)===editId);if(item)Object.assign(item,data)}else state.criteria.push({id:makeId(),...data});showEditor('criterionEditor',false);return save();
+  }
+  if(button.dataset.editCriterion){const item=state.criteria.find(entry=>String(entry.id)===button.dataset.editCriterion);if(item)return openCriterion(item)}
+  if(button.dataset.deleteCriterion&&shouldDelete('this criterion')){state.criteria=state.criteria.filter(entry=>String(entry.id)!==button.dataset.deleteCriterion);return save()}
+
+  if(action==='open-add-task')return openTask();
+  if(action==='close-task-editor')return showEditor('taskEditor',false);
+  if(action==='save-task'){const text=$('taskText').value.trim();if(!text)return alert('Please add a task.');const data={text,stage:$('taskStage').value,priority:$('taskPriority').value};const editId=$('taskEditId').value;if(editId){const item=state.tasks.find(entry=>String(entry.id)===editId);if(item)Object.assign(item,data)}else state.tasks.push({id:makeId(),...data});showEditor('taskEditor',false);return save()}
+  if(button.dataset.editTask){const item=state.tasks.find(entry=>String(entry.id)===button.dataset.editTask);if(item)return openTask(item)}
+  if(button.dataset.deleteTask&&shouldDelete('this task')){state.tasks=state.tasks.filter(entry=>String(entry.id)!==button.dataset.deleteTask);return save()}
+
+  if(action==='open-add-research')return openResearch();
+  if(action==='close-research-editor')return showEditor('researchEditor',false);
+  if(action==='save-research'){const title=$('researchTitle').value.trim();const enteredUrl=$('researchUrl').value.trim();if(!title)return alert('Please add a research title.');if(enteredUrl&&!safeUrl(enteredUrl))return alert('Please enter a valid web link.');const data={title,url:enteredUrl,note:$('researchNote').value.trim(),status:$('researchStatus').value};const editId=$('researchEditId').value;if(editId){const item=state.research.find(entry=>String(entry.id)===editId);if(item)Object.assign(item,data)}else state.research.push({id:makeId(),...data});showEditor('researchEditor',false);return save()}
+  if(button.dataset.editResearch){const item=state.research.find(entry=>String(entry.id)===button.dataset.editResearch);if(item)return openResearch(item)}
+  if(button.dataset.deleteResearch&&shouldDelete('this research item')){state.research=state.research.filter(entry=>String(entry.id)!==button.dataset.deleteResearch);return save()}
+
+  if(action==='open-add-log')return openLog();
+  if(action==='close-log-editor')return showEditor('logEditor',false);
+  if(action==='save-log'){const title=$('logTitle').value.trim();if(!title)return alert('Please add a title.');const data={type:$('logType').value,title,notes:$('logNotes').value.trim(),result:$('logResult').value.trim()};const editId=$('logEditId').value;if(editId){const item=state.log.find(entry=>String(entry.id)===editId);if(item)Object.assign(item,data)}else state.log.push({id:makeId(),...data});showEditor('logEditor',false);return save()}
+  if(button.dataset.editLog){const item=state.log.find(entry=>String(entry.id)===button.dataset.editLog);if(item)return openLog(item)}
+  if(button.dataset.deleteLog&&shouldDelete('this entry')){state.log=state.log.filter(entry=>String(entry.id)!==button.dataset.deleteLog);return save()}
+
+  if(action==='open-add-event')return openEvent();
+  if(action==='close-event-editor')return showEditor('eventEditor',false);
+  if(action==='save-event'){const title=$('eventTitle').value.trim();const date=$('eventDate').value;if(!title||!date)return alert('Please add an event title and date.');const data={title,date,time:$('eventTime').value,type:$('eventType').value};const editId=$('eventEditId').value;if(editId){const item=state.events.find(entry=>String(entry.id)===editId);if(item)Object.assign(item,data)}else state.events.push({id:makeId(),...data});monthCursor=new Date(`${date}T12:00:00`);showEditor('eventEditor',false);return save()}
+  if(button.dataset.editEvent){const item=state.events.find(entry=>String(entry.id)===button.dataset.editEvent);if(item)return openEvent(item)}
+  if(button.dataset.deleteEvent&&shouldDelete('this event')){state.events=state.events.filter(entry=>String(entry.id)!==button.dataset.deleteEvent);return save()}
+  if(button.dataset.pickDate)return openEvent(null,button.dataset.pickDate);
+}
+function init(){
+  state=load();initNav();document.addEventListener('click',handleClick);
+  $('previousMonth').addEventListener('click',()=>{monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()-1,1);renderCalendar()});
+  $('nextMonth').addEventListener('click',()=>{monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()+1,1);renderCalendar()});
+  window.ParkScoreOS={getState:()=>state,save,makeId,localISO,safeUrl,setMonth:date=>{monthCursor=new Date(date.getFullYear(),date.getMonth(),1)},showPage,renderAll};
+  renderAll();window.dispatchEvent(new Event('ParkScoreReady'));
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
