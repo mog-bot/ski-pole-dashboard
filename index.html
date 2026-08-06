@@ -23,6 +23,7 @@
             <p>A personal workspace for designing, researching and testing a fair ski-park scoring system.</p>
             <div class="metrics">
               <div class="metric"><strong id="metricCriteria">0</strong><span>Scoring criteria</span></div>
+              <div class="metric"><strong id="metricSuccess">0</strong><span>Success criteria met</span></div>
               <div class="metric"><strong id="metricTasks">0</strong><span>Open tasks</span></div>
               <div class="metric"><strong id="metricEvents">0</strong><span>Upcoming events</span></div>
             </div>
@@ -45,10 +46,7 @@
       </section>
 
       <section id="brief" class="page">
-        <header class="page-head">
-          <div><h1>Project brief</h1><p>The purpose, question and next direction of the project.</p></div>
-          <button class="icon-text-button" type="button" data-action="edit-brief"><span>✎</span> Edit</button>
-        </header>
+        <header class="page-head"><div><h1>Project brief</h1><p>The purpose, question and next direction of the project.</p></div><button class="icon-text-button" type="button" data-action="edit-brief"><span>✎</span> Edit</button></header>
         <div id="briefView" class="grid two"></div>
         <div id="briefEditor" class="card editor-panel" hidden>
           <div class="form-grid two">
@@ -63,11 +61,25 @@
         </div>
       </section>
 
+      <section id="success" class="page">
+        <header class="page-head"><div><h1>Success criteria</h1><p>Measurable checks that show whether the project works.</p></div><button class="primary" type="button" data-action="open-add-success">+ Add success criterion</button></header>
+        <div class="score-summary card"><div><strong id="successMetCount">0 / 0</strong><span>Criteria met</span></div><p id="successProgressAdvice"></p></div>
+        <div id="successEditor" class="card editor-panel" hidden>
+          <h2 id="successEditorTitle">Add success criterion</h2>
+          <input id="successEditId" type="hidden">
+          <div class="form-grid two">
+            <label>Success criterion<input id="successTitle" placeholder="Different judges give similar scores"></label>
+            <label>Status<select id="successStatus"><option>Not started</option><option>In progress</option><option>Met</option></select></label>
+            <label class="full">How it will be measured<textarea id="successMeasure" placeholder="Three judges score the same run within 10 points of each other."></textarea></label>
+            <label class="full">Evidence or notes<textarea id="successEvidence" placeholder="Add test results or evidence here."></textarea></label>
+          </div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="close-success-editor">Cancel</button><button class="primary" type="button" data-action="save-success">Save criterion</button></div>
+        </div>
+        <div id="successList" class="simple-list"></div>
+      </section>
+
       <section id="scoring" class="page">
-        <header class="page-head">
-          <div><h1>Scoring model</h1><p>Define what is judged and how much each criterion counts.</p></div>
-          <button class="primary" type="button" data-action="open-add-criterion">+ Add criterion</button>
-        </header>
+        <header class="page-head"><div><h1>Scoring model</h1><p>Define what is judged and how much each criterion counts.</p></div><button class="primary" type="button" data-action="open-add-criterion">+ Add criterion</button></header>
         <div class="score-summary card"><div><strong id="criteriaWeightTotal">0%</strong><span>Total weighting</span></div><p id="criteriaWeightAdvice"></p></div>
         <div id="criterionEditor" class="card editor-panel" hidden>
           <h2 id="criterionEditorTitle">Add criterion</h2>
@@ -84,83 +96,53 @@
       </section>
 
       <section id="tasks" class="page">
-        <header class="page-head">
-          <div><h1>Tasks</h1><p>The work needed to move the scoring system forward.</p></div>
-          <button class="primary" type="button" data-action="open-add-task">+ Add task</button>
-        </header>
+        <header class="page-head"><div><h1>Tasks</h1><p>The work needed to move the scoring system forward.</p></div><button class="primary" type="button" data-action="open-add-task">+ Add task</button></header>
         <div id="taskEditor" class="card editor-panel" hidden>
-          <h2 id="taskEditorTitle">Add task</h2>
-          <input id="taskEditId" type="hidden">
-          <div class="form-grid two">
-            <label>Task<input id="taskText"></label>
-            <label>Stage<select id="taskStage"><option>Research</option><option>Design</option><option>Prototype</option><option>Test</option><option>Done</option></select></label>
-            <label>Priority<select id="taskPriority"><option>High</option><option>Medium</option><option>Low</option></select></label>
-          </div>
+          <h2 id="taskEditorTitle">Add task</h2><input id="taskEditId" type="hidden">
+          <div class="form-grid two"><label>Task<input id="taskText"></label><label>Stage<select id="taskStage"><option>Research</option><option>Design</option><option>Prototype</option><option>Test</option><option>Done</option></select></label><label>Priority<select id="taskPriority"><option>High</option><option>Medium</option><option>Low</option></select></label></div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="close-task-editor">Cancel</button><button class="primary" type="button" data-action="save-task">Save task</button></div>
         </div>
         <div id="taskList" class="simple-list"></div>
       </section>
 
       <section id="research" class="page">
-        <header class="page-head">
-          <div><h1>Research & links</h1><p>Save judging systems, articles, videos and evidence.</p></div>
-          <button class="primary" type="button" data-action="open-add-research">+ Add research</button>
-        </header>
+        <header class="page-head"><div><h1>Research & links</h1><p>Save judging systems, articles, videos and evidence.</p></div><button class="primary" type="button" data-action="open-add-research">+ Add research</button></header>
         <div id="researchEditor" class="card editor-panel" hidden>
-          <h2 id="researchEditorTitle">Add research</h2>
-          <input id="researchEditId" type="hidden">
-          <div class="form-grid two">
-            <label>Title<input id="researchTitle"></label>
-            <label>Link<input id="researchUrl" type="url" inputmode="url" placeholder="https://..."></label>
-            <label>Status<select id="researchStatus"><option>To review</option><option>Useful</option><option>Used in project</option></select></label>
-            <label class="full">What it shows<textarea id="researchNote"></textarea></label>
-          </div>
+          <h2 id="researchEditorTitle">Add research</h2><input id="researchEditId" type="hidden">
+          <div class="form-grid two"><label>Title<input id="researchTitle"></label><label>Link<input id="researchUrl" type="url" inputmode="url" placeholder="https://..."></label><label>Status<select id="researchStatus"><option>To review</option><option>Useful</option><option>Used in project</option></select></label><label class="full">What it shows<textarea id="researchNote"></textarea></label></div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="close-research-editor">Cancel</button><button class="primary" type="button" data-action="save-research">Save research</button></div>
         </div>
         <div id="researchList" class="simple-list"></div>
       </section>
 
       <section id="log" class="page">
-        <header class="page-head">
-          <div><h1>Ideas & testing</h1><p>Keep design ideas, test results, decisions and learning together.</p></div>
-          <button class="primary" type="button" data-action="open-add-log">+ Add entry</button>
-        </header>
+        <header class="page-head"><div><h1>Ideas & testing</h1><p>Keep design ideas, test results, decisions and learning together.</p></div><button class="primary" type="button" data-action="open-add-log">+ Add entry</button></header>
         <div id="logEditor" class="card editor-panel" hidden>
-          <h2 id="logEditorTitle">Add entry</h2>
-          <input id="logEditId" type="hidden">
-          <div class="form-grid two">
-            <label>Type<select id="logType"><option>Idea</option><option>Test</option><option>Decision</option><option>Learning</option></select></label>
-            <label>Title<input id="logTitle"></label>
-            <label class="full">Notes<textarea id="logNotes"></textarea></label>
-            <label class="full">Result or next action<textarea id="logResult"></textarea></label>
-          </div>
+          <h2 id="logEditorTitle">Add entry</h2><input id="logEditId" type="hidden">
+          <div class="form-grid two"><label>Type<select id="logType"><option>Idea</option><option>Test</option><option>Decision</option><option>Learning</option></select></label><label>Title<input id="logTitle"></label><label class="full">Notes<textarea id="logNotes"></textarea></label><label class="full">Result or next action<textarea id="logResult"></textarea></label></div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="close-log-editor">Cancel</button><button class="primary" type="button" data-action="save-log">Save entry</button></div>
         </div>
         <div id="logList" class="simple-list"></div>
       </section>
 
+      <section id="document" class="page">
+        <header class="page-head"><div><h1>Project Doc</h1><p>A single document for your report, notes, planning or draft writing.</p></div><button class="icon-text-button" type="button" data-action="edit-document"><span>✎</span> Edit document</button></header>
+        <article id="documentView" class="card document-paper"></article>
+        <div id="documentEditor" class="card editor-panel document-editor" hidden>
+          <div class="form-grid"><label>Document title<input id="documentTitle"></label><label>Document content<textarea id="documentBody" placeholder="Write your project document here..."></textarea></label></div>
+          <div class="editor-actions"><button class="secondary" type="button" data-action="cancel-document">Cancel</button><button class="primary" type="button" data-action="save-document">Save document</button></div>
+        </div>
+      </section>
+
       <section id="calendar" class="page">
-        <header class="page-head">
-          <div><h1>Calendar</h1><p>Deadlines, interviews, prototype sessions and scoring tests.</p></div>
-          <button class="primary" type="button" data-action="open-add-event">+ Add event</button>
-        </header>
+        <header class="page-head"><div><h1>Calendar</h1><p>Deadlines, interviews, prototype sessions and scoring tests.</p></div><button class="primary" type="button" data-action="open-add-event">+ Add event</button></header>
         <div id="eventEditor" class="card editor-panel" hidden>
-          <h2 id="eventEditorTitle">Add event</h2>
-          <input id="eventEditId" type="hidden">
-          <div class="form-grid two">
-            <label>Title<input id="eventTitle"></label>
-            <label>Date<input id="eventDate" type="date"></label>
-            <label>Time<input id="eventTime" type="time"></label>
-            <label>Type<select id="eventType"><option>Deadline</option><option>Meeting</option><option>Research</option><option>Prototype</option><option>Testing</option><option>General</option></select></label>
-          </div>
+          <h2 id="eventEditorTitle">Add event</h2><input id="eventEditId" type="hidden">
+          <div class="form-grid two"><label>Title<input id="eventTitle"></label><label>Date<input id="eventDate" type="date"></label><label>Time<input id="eventTime" type="time"></label><label>Type<select id="eventType"><option>Deadline</option><option>Meeting</option><option>Research</option><option>Prototype</option><option>Testing</option><option>General</option></select></label></div>
           <div class="editor-actions"><button class="secondary" type="button" data-action="close-event-editor">Cancel</button><button class="primary" type="button" data-action="save-event">Save event</button></div>
         </div>
         <div class="calendar-layout">
-          <div class="card">
-            <div class="calendar-head"><button id="previousMonth" class="secondary" type="button">Previous</button><h2 id="monthLabel"></h2><button id="nextMonth" class="secondary" type="button">Next</button></div>
-            <div class="weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-            <div id="calendarGrid" class="calendar-grid"></div>
-          </div>
+          <div class="card"><div class="calendar-head"><button id="previousMonth" class="secondary" type="button">Previous</button><h2 id="monthLabel"></h2><button id="nextMonth" class="secondary" type="button">Next</button></div><div class="weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div><div id="calendarGrid" class="calendar-grid"></div></div>
           <div class="card"><h2>Upcoming</h2><div id="upcomingList" class="simple-list compact"></div></div>
         </div>
       </section>
@@ -169,13 +151,9 @@
 
   <button id="aiToggle" class="ai-toggle" type="button" aria-expanded="false" aria-controls="aiPanel">✦ Project AI</button>
   <aside id="aiPanel" class="ai-panel" hidden aria-label="Project AI">
-    <div class="ai-panel-head"><div><strong>Project AI</strong><small>Can read and update this project</small></div><button id="aiClose" class="icon-button" type="button" aria-label="Close Project AI">×</button></div>
-    <div id="aiChat" class="chat" aria-live="polite"><div class="bubble">Try “Add test sample runs with three judges to tasks” or “Schedule scoring prototype test for next Friday at 3pm.”</div></div>
-    <div class="quick-prompts">
-      <button type="button" data-prompt="Summarise my project">Summarise</button>
-      <button type="button" data-prompt="What should I do next?">Next step</button>
-      <button type="button" data-prompt="List my scoring criteria">Criteria</button>
-    </div>
+    <div class="ai-panel-head"><div><strong>Project AI</strong><small>Can read and update the whole project</small></div><button id="aiClose" class="icon-button" type="button" aria-label="Close Project AI">×</button></div>
+    <div id="aiChat" class="chat" aria-live="polite"><div class="bubble">Try “Add success criterion judges score within 10 points” or “Add this paragraph to my document: …”</div></div>
+    <div class="quick-prompts"><button type="button" data-prompt="Summarise my project">Summarise</button><button type="button" data-prompt="What should I do next?">Next step</button><button type="button" data-prompt="List my success criteria">Success criteria</button><button type="button" data-prompt="What is in my document?">Read document</button></div>
     <div class="ai-entry"><input id="aiInput" placeholder="Ask or make a project change"><button id="sendAI" class="primary" type="button">Send</button></div>
   </aside>
 
